@@ -50,9 +50,16 @@ Then follow the installation instruction for the two Gazebo plugins mentioned in
 
 In addition, install the gstreamer plugin for Gazebo from [sitl_gazebo](https://github.com/PX4/sitl_gazebo), where instructions are reported. To ensure that the proper `Makefile` is generated, run
 
-$ cmake -DBUILD_GSTREAMER_PLUGIN=ON -DBUILD_ROS_INTERFACE=ON ..
+`$ cmake -DBUILD_GSTREAMER_PLUGIN=ON -DBUILD_ROS_INTERFACE=ON ..`
 
-Clone also [ardupilot](https://github.com/ArduPilot/ardupilot).
+Clone also [ardupilot](https://github.com/ArduPilot/ardupilot) and use the proper version of ArduSub, e.g., beta.
+```
+git clone https://github.com/ArduPilot/ardupilot.git
+cd ardupilot
+git fetch && git fetch --tags
+git checkout ArduSub-beta
+git submodule update --init --recursive
+```
 
 
 #### ROS package ####
@@ -112,7 +119,7 @@ Clone also [ardupilot](https://github.com/ArduPilot/ardupilot).
       cd ~/ardupilot/Tools/autotest 
       python sim_vehicle.py -v ArduSub -f gazebo-bluerov2 -L RATBeach --out=udp:0.0.0.0:14550 --map
       ```
-    - Run the ROS package: $ roslaunch bluerov_bringup bluerov_bringup.launch record:=0
+    - Run the ROS package: `$ roslaunch bluerov_bringup bluerov_bringup.launch record:=0`
 
 - Gazebo Teleop
 
