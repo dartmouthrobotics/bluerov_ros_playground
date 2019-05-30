@@ -22,10 +22,40 @@ What is possible ?
   - numpy
   - [gi, gobject](https://wiki.ubuntu.com/Novacut/GStreamer1.0)
   - PyYAML
-- [freefloating_gazebo](https://github.com/freefloating-gazebo/freefloating_gazebo)
+  - pymavlink
+  - mavproxy
+- [freebuoyancy_gazebo](https://github.com/bluerobotics/freebuoyancy_gazebo)
+- [ardupilot_gazebo](https://github.com/patrickelectric/ardupilot_gazebo)
+- [sitl_gazebo](https://github.com/PX4/sitl_gazebo)
+- [ardupilot](https://github.com/ArduPilot/ardupilot)
 
 
 ### Installation ###
+The installation is in two steps:
+ 1. Installing all the Gazebo dependencies to make the Gazebo simulation working.
+ 2. Installing ROS related packages. 
+
+#### Gazebo related ####
+Assuming that ROS with Gazebo is installed, Gazebo needs to be updated from the OSRF:
+```
+sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-latest.list'
+wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install gazebo7
+# For developers that work on top of Gazebo, one extra package
+sudo apt-get install libgazebo7-dev
+```
+Then follow the installation instruction for the two Gazebo plugins mentioned in step 2. and 3.
+[Running ArduSub SITL with Gazebo](https://www.ardusub.com/developers/sitl.html)
+
+In addition, install the gstreamer plugin for Gazebo from [sitl_gazebo](https://github.com/PX4/sitl_gazebo), where instructions are reported. To ensure that the proper `Makefile` is generated, run
+
+$ cmake -DBUILD_GSTREAMER_PLUGIN=ON -DBUILD_ROS_INTERFACE=ON ..
+
+Clone also [ardupilot](https://github.com/ArduPilot/ardupilot).
+
+
+#### ROS package ####
  1. Go to your ROS package source directory:
     - `$ cd ros_workspace_path/src`
  2. Clone this project.
@@ -65,6 +95,24 @@ What is possible ?
     This example allow SITL communication with Gazebo, right now the only interaction that happen is the thruster control using [thruster pwm fitting](https://colab.research.google.com/notebook#fileId=1CEDW9ONTJ8Aik-HVsqck8Y_EcHYLg0zK).
     - Run SITL and start gazebo.launch
     - `roslaunch bluerov_ros_playground gazebo.launch`
+
+    Another way of doing is (every line corresponds to a different terminal):
+    - Start Gazebo (exporting properly all the paths -- note that the main folder is assumed to be the home directory)
+      ```
+      cd ~/catkin_ws/src/bluerov_ros_playground
+      source gazebo.sh
+      export GAZEBO_MODEL_PATH=~/ardupilot_gazebo/models:${GAZEBO_MODEL_PATH}
+      export GAZEBO_RESOURCE_PATH=~/ardupilot_gazebo/worlds:${GAZEBO_RESOURCE_PATH}
+      export SITL_GAZEBO_PATH=~/sitl_gazebo
+      export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:~/sitl_gazebo/build
+      gazebo worlds/underwater.world --verbose
+      ```
+    - Run the ArduPilot SITL
+      ```
+      cd ~/ardupilot/Tools/autotest 
+      python sim_vehicle.py -v ArduSub -f gazebo-bluerov2 -L RATBeach --out=udp:0.0.0.0:14550 --map
+      ```
+    - Run the ROS package: $ roslaunch bluerov_bringup bluerov_bringup.launch record:=0
 
 - Gazebo Teleop
 
